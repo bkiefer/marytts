@@ -39,20 +39,20 @@ public class DutchConfigTest {
 
 	@Test
 	public void isNotMainConfig() throws MaryConfigurationException {
-		MaryConfig m = new DutchchConfig();
+		MaryConfig m = new DutchConfig();
 		assertFalse(m.isMainConfig());
 	}
 
 	@Test
 	public void canGet() {
-		MaryConfig m = MaryConfig.getLanguageConfig(Locale.DUTCH);
-		assertNotNull(m);
-		assertTrue(((LanguageConfig) m).getLocales().contains(Locale.DUTCH));
+          MaryConfig m = MaryConfig.getLanguageConfig(new Locale("nl"));
+          assertNotNull(m);
+          assertTrue(((LanguageConfig) m).getLocales().contains(new Locale("nl")));
 	}
 
 	@Test
 	public void hasDutchhLocale() throws MaryConfigurationException {
 		LanguageConfig e = new DutchConfig();
-		assertTrue(e.getLocales().contains(Locale.DUTCH));
+		assertTrue(e.getLocales().contains(new Locale("nl")));
 	}
 }
