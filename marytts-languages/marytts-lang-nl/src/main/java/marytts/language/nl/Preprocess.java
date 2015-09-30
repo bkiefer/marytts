@@ -3,8 +3,9 @@ package marytts.language.nl;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-import com.ibm.icu.util.ULocale;
 
 import marytts.datatypes.MaryData;
 import marytts.datatypes.MaryDataType;
@@ -20,6 +21,7 @@ import org.w3c.dom.traversal.NodeFilter;
 import org.w3c.dom.traversal.TreeWalker;
 
 import com.ibm.icu.text.RuleBasedNumberFormat;
+import com.ibm.icu.util.ULocale;
 
 /**
  * @author Tristan Hamilton
@@ -33,8 +35,8 @@ public class Preprocess extends InternalModule {
 	protected final String ordinalRule;
 
 	public Preprocess() {
-		super("Preprocess", MaryDataType.TOKENS, MaryDataType.WORDS, Locale.FRENCH);
-		this.rbnf = new RuleBasedNumberFormat(ULocale.FRENCH, RuleBasedNumberFormat.SPELLOUT);
+		super("Preprocess", MaryDataType.TOKENS, MaryDataType.WORDS, new Locale("nl"));
+		this.rbnf = new RuleBasedNumberFormat(new ULocale("nl"), RuleBasedNumberFormat.SPELLOUT);
 		this.cardinalRule = "%spellout-numbering";
 		this.ordinalRule = getOrdinalRuleName(rbnf);
 	}
@@ -47,6 +49,8 @@ public class Preprocess extends InternalModule {
 		return result;
 	}
 
+  private static final Pattern ordinalPattern = Pattern.compile("(\\d+)[e.]");
+
 	protected void checkForNumbers(Document doc) {
 		TreeWalker tw = ((DocumentTraversal) doc).createTreeWalker(doc, NodeFilter.SHOW_ELEMENT,
 				new NameNodeFilter(MaryXML.TOKEN), false);
@@ -57,25 +61,23 @@ public class Preprocess extends InternalModule {
 				continue;
 			}
 			String origText = MaryDomUtils.tokenText(t);
-			if (MaryDomUtils.tokenText(t).matches("\\d+(e|er|re|ère|ème)")) {
-				String matched = MaryDomUtils.tokenText(t).split("e|ere|er|re|ère|ème")[0];
-				if (matched.equals("1")) {
-					if (MaryDomUtils.tokenText(t).matches("\\d+er")) {
-						MaryDomUtils.setTokenText(t, expandOrdinal(Double.parseDouble(matched)));
-					} else {
-						String s = expandOrdinal(Double.parseDouble(matched));
-						MaryDomUtils.setTokenText(t, s.replace("ier", "ière"));
-					}
-				} else {
-					MaryDomUtils.setTokenText(t, expandOrdinal(Double.parseDouble(matched)));
-				}
-			} else if (MaryDomUtils.tokenText(t).matches("\\d+")) {
-				MaryDomUtils.setTokenText(t, expandNumber(Double.parseDouble(MaryDomUtils.tokenText(t))));
+                        boolean textModified = false;
+			Matcher m = ordinalPattern.matcher(origText);
+			if (m.matches()) {
+			  String matched = m.group(1);
+			  Long l = Long.parseLong(matched);
+			  MaryDomUtils.setTokenText(t, expandOrdinal(l));
+                          textModified = true;
+			} else if (origText.matches("\\d+")) {
+			  MaryDomUtils.setTokenText(t, expandNumber(Long.parseLong(origText)));
+                          textModified = true;
 			}
+                        
 			// if token isn't ignored but there is no handling rule don't add MTU
-			if (!origText.equals(MaryDomUtils.tokenText(t))) {
-				MaryDomUtils.encloseWithMTU(t, origText, null);
+			if (textModified) {
+                            MaryDomUtils.encloseWithMTU(t, origText, null);
 			}
+                        
 		}
 	}
 
@@ -112,6 +114,6 @@ public class Preprocess extends InternalModule {
 			}
 		}
 		throw new UnsupportedOperationException("The locale " + rbnf.getLocale(ULocale.ACTUAL_LOCALE)
-				+ " doesn't supports ordinal spelling.");
+				+ " doesn't support ordinal spelling.");
 	}
 }
