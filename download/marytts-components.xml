@@ -239,4 +239,12 @@
         </package>
         <depends language="tr" version="5.1"/>
     </voice>
+    <voice locale="nl" name="dfki-antje" gender="female" type="unit selection" version="5.2">
+        <description>A female Dutch unit selection voice</description>
+        <license href="http://mary.dfki.de/download/by-nd-3.0.html"/>
+        <package md5sum="618d7e330f4c82813a78f4acc13a3b8e" filename="voice-dfki-antje-5.2.zip" size="538806903">
+            <location folder="false" href="http://ox6.dfki.de/publications/documents/10/1bae6caf821599af28d4710ce203778"/>
+        </package>
+        <depends language="nl" version="5.1"/>
+    </voice>
 </marytts-install>

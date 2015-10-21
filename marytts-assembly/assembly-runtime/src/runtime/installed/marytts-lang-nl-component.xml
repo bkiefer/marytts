@@ -1,0 +1,10 @@
+<marytts-install xmlns="http://mary.dfki.de/installer">
+  <language locale="nl" name="nl" version="${project.version}">
+    <description>nl language component</description>
+    <license href="http://www.gnu.org/licenses/lgpl-3.0-standalone.html"/>
+    <package filename="marytts-lang-nl-${project.version}.zip" md5sum="dummy" size="0">
+      <location href="http://mary.dfki.de/download/${project.version}/"/>
+    </package>
+    <files>lib/marytts-lang-nl-${project.version}.jar</files>
+  </language>
+</marytts-install>
