@@ -7,8 +7,8 @@
 	<vowel ph="E" vlng="s" vheight="2" vfront="1" vrnd="-"/>
 	<vowel ph="E:" vlng="l" vheight="2" vfront="1" vrnd="-"/>
 	<vowel ph="a" vlng="l" vheight="3" vfront="2" vrnd="-"/>
-	<vowel ph="0" vlng="s" vheight="2" vfront="3" vrnd="+"/>
-	<vowel ph="0:" vlng="l" vheight="2" vfront="3" vrnd="+"/>
+	<vowel ph="O" vlng="s" vheight="2" vfront="3" vrnd="+"/>
+	<vowel ph="O:" vlng="l" vheight="2" vfront="3" vrnd="+"/>
 	<vowel ph="o" vlng="l" vheight="2" vfront="3" vrnd="+"/>
 	<vowel ph="u" vlng="s" vheight="1" vfront="3" vrnd="+"/>
 	<vowel ph="y" vlng="l" vheight="1" vfront="2" vrnd="+"/>
