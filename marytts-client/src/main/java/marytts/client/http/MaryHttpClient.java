@@ -28,7 +28,6 @@ import java.io.PrintWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -42,7 +41,9 @@ import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.AudioFormat.Encoding;
+import javax.sound.sampled.UnsupportedAudioFileException;
 
+import marytts.client.AudioFormatOutputStream;
 import marytts.client.MaryClient;
 import marytts.client.MaryGUIClient;
 import marytts.util.http.Address;
@@ -54,7 +55,7 @@ import marytts.util.string.StringUtils;
  * 
  * @author Marc Schr&ouml;der, oytun.turk
  * @see MaryGUIClient A GUI interface to this client
- * @see marytts.server.MaryServer Description of the MARY protocol
+ * @see marytts.server.MaryServer Description of the MARY protocol.
  */
 
 public class MaryHttpClient extends MaryClient {
@@ -65,8 +66,6 @@ public class MaryHttpClient extends MaryClient {
 	 * 
 	 * @throws IOException
 	 *             if communication with the server fails
-	 * @throws UnknownHostException
-	 *             if the host could not be found
 	 */
 	public MaryHttpClient() throws IOException {
 		super();
@@ -84,14 +83,10 @@ public class MaryHttpClient extends MaryClient {
 	 * <li><code>mary.client.quiet</code> (=true/false) - tells the client not to print any of the normal information to stderr.</li>
 	 * </ul>
 	 * 
-	 * @param host
-	 *            the host where to contact a MARY server
-	 * @param port
-	 *            the socket port where to contact a MARY server
+	 * @param serverAddress
+	 *            the address of the server
 	 * @throws IOException
 	 *             if communication with the server fails
-	 * @throws UnknownHostException
-	 *             if the host could not be found
 	 */
 	public MaryHttpClient(Address serverAddress) throws IOException {
 		super(serverAddress);
@@ -102,18 +97,14 @@ public class MaryHttpClient extends MaryClient {
 	 * given host and port. Note that in applets, the host must be the same as the one from which the applet was loaded;
 	 * otherwise, a security exception is thrown.
 	 * 
-	 * @param host
-	 *            the host where to contact a MARY server
-	 * @param port
-	 *            the socket port where to contact a MARY server
+	 * @param serverAddress
+	 *            the address of the server
 	 * @param profile
 	 *            determines whether profiling (timing) information is calculated
 	 * @param quiet
 	 *            tells the client not to print any of the normal information to stderr
 	 * @throws IOException
 	 *             if communication with the server fails
-	 * @throws UnknownHostException
-	 *             if the host could not be found
 	 */
 	public MaryHttpClient(Address serverAddress, boolean profile, boolean quiet) throws IOException {
 		super(serverAddress, profile, quiet);
@@ -192,11 +183,9 @@ public class MaryHttpClient extends MaryClient {
 	/**
 	 * Request the available audio effects for a voice from the server
 	 * 
-	 * @param voicename
-	 *            the voice
 	 * @return A string of available audio effects and default parameters, i.e. "FIRFilter,Robot(amount=50)"
 	 * @throws IOException
-	 * @throws UnknownHostException
+	 *             IOException
 	 */
 	@Override
 	protected String getDefaultAudioEffects() throws IOException {
@@ -529,6 +518,15 @@ public class MaryHttpClient extends MaryClient {
 		{
 			OutputStream os = (OutputStream) output;
 			InputStream bis = new BufferedInputStream(fromServerStream);
+			if (os instanceof AudioFormatOutputStream) {
+				AudioFormatOutputStream afos = (AudioFormatOutputStream) os;
+				try {
+					AudioFileFormat format = AudioSystem.getAudioFileFormat(bis);
+					afos.setFormat(format.getFormat());
+				} catch (UnsupportedAudioFileException e) {
+					throw new IOException(e.getMessage(), e);
+				}
+			}
 			byte[] bbuf = new byte[1024];
 			int nr;
 			while ((nr = bis.read(bbuf, 0, bbuf.length)) != -1) {

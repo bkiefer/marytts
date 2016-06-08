@@ -54,6 +54,7 @@ import org.w3c.dom.traversal.NodeIterator;
  * The phonemiser module -- java implementation.
  *
  * @author Marc Schr&ouml;der, Sathish
+ * @author ingmar
  */
 
 public class JPhonemiser extends InternalModule {
@@ -66,6 +67,7 @@ public class JPhonemiser extends InternalModule {
 	protected AllophoneSet allophoneSet;
 
 	protected Pattern punctuationPosRegex;
+	protected Pattern unpronounceablePosRegex;
 
 	public JPhonemiser(String propertyPrefix) throws IOException, MaryConfigurationException {
 		this("JPhonemiser", MaryDataType.PARTSOFSPEECH, MaryDataType.PHONEMES, propertyPrefix + "allophoneset", propertyPrefix
@@ -75,12 +77,25 @@ public class JPhonemiser extends InternalModule {
 
 	/**
 	 * Constructor providing the individual filenames of files that are required.
-	 * 
-	 * @param allophonesFilename
-	 * @param userdictFilename
-	 * @param lexiconFilename
-	 * @param ltsFilename
-	 * @throws Exception
+	 *
+	 * @param componentName
+	 *            componentName
+	 * @param inputType
+	 *            inputType
+	 * @param outputType
+	 *            outputType
+	 * @param allophonesProperty
+	 *            allophonesProperty
+	 * @param userdictProperty
+	 *            userdictProperty
+	 * @param lexiconProperty
+	 *            lexiconProperty
+	 * @param ltsProperty
+	 *            ltsProperty
+	 * @throws IOException
+	 *             IOException
+	 * @throws MaryConfigurationException
+	 *             MaryConfigurationException
 	 */
 	public JPhonemiser(String componentName, MaryDataType inputType, MaryDataType outputType, String allophonesProperty,
 			String userdictProperty, String lexiconProperty, String ltsProperty) throws IOException, MaryConfigurationException {
@@ -89,13 +104,27 @@ public class JPhonemiser extends InternalModule {
 
 	/**
 	 * Constructor providing the individual filenames of files that are required.
-	 * 
-	 * @param allophonesFilename
-	 * @param userdictFilename
-	 * @param lexiconFilename
-	 * @param ltsFilename
-	 * @param removetrailingonefromphonesBoolean
-	 * @throws Exception
+	 *
+	 * @param componentName
+	 *            componentName
+	 * @param inputType
+	 *            inputType
+	 * @param outputType
+	 *            outputType
+	 * @param allophonesProperty
+	 *            allophonesProperty
+	 * @param userdictProperty
+	 *            userdictProperty
+	 * @param lexiconProperty
+	 *            lexiconProperty
+	 * @param ltsProperty
+	 *            ltsProperty
+	 * @param removetrailingonefromphonesProperty
+	 *            removetrailingonefromphonesProperty
+	 * @throws IOException
+	 *             IOException
+	 * @throws MaryConfigurationException
+	 *             MaryConfigurationException
 	 */
 	public JPhonemiser(String componentName, MaryDataType inputType, MaryDataType outputType, String allophonesProperty,
 			String userdictProperty, String lexiconProperty, String ltsProperty, String removetrailingonefromphonesProperty)
@@ -124,6 +153,7 @@ public class JPhonemiser extends InternalModule {
 	public void startup() throws Exception {
 		super.startup();
 		setPunctuationPosRegex();
+		setUnpronounceablePosRegex();
 	}
 
 	public MaryData process(MaryData d) throws Exception {
@@ -191,7 +221,7 @@ public class JPhonemiser extends InternalModule {
 	/**
 	 * Phonemise the word text. This starts with a simple lexicon lookup, followed by some heuristics, and finally applies
 	 * letter-to-sound rules if nothing else was successful.
-	 * 
+	 *
 	 * @param text
 	 *            the textual (graphemic) form of a word.
 	 * @param pos
@@ -251,10 +281,12 @@ public class JPhonemiser extends InternalModule {
 
 	/**
 	 * Look a given text up in the (standard) lexicon. part-of-speech is used in case of ambiguity.
-	 * 
+	 *
 	 * @param text
+	 *            text
 	 * @param pos
-	 * @return
+	 *            pos
+	 * @return null if text == null or text.length is 0, null if entries.length is 0, entries[0] otherwise
 	 */
 	public String lexiconLookup(String text, String pos) {
 		if (text == null || text.length() == 0)
@@ -293,10 +325,12 @@ public class JPhonemiser extends InternalModule {
 
 	/**
 	 * look a given text up in the userdict. part-of-speech is used in case of ambiguity.
-	 * 
+	 *
 	 * @param text
+	 *            text
 	 * @param pos
-	 * @return
+	 *            pos
+	 * @return null if userdict is null or text is null or text.length is 0, null if entries is null, transcr otherwise
 	 */
 	public String userdictLookup(String text, String pos) {
 		if (userdict == null || text == null || text.length() == 0)
@@ -336,8 +370,8 @@ public class JPhonemiser extends InternalModule {
 
 	/**
 	 * Access the allophone set underlying this phonemiser.
-	 * 
-	 * @return
+	 *
+	 * @return allophoneSet
 	 */
 	public AllophoneSet getAllophoneSet() {
 		return allophoneSet;
@@ -345,14 +379,17 @@ public class JPhonemiser extends InternalModule {
 
 	/**
 	 * Read a lexicon. Lines must have the format
-	 * 
+	 *
 	 * graphemestring | phonestring | optional-parts-of-speech
-	 * 
+	 *
 	 * The pos-item is optional. Different pos's belonging to one grapheme chain may be separated by whitespace
-	 * 
-	 * 
+	 *
+	 *
 	 * @param lexiconFilename
-	 * @return
+	 *            lexiconFilename
+	 * @throws IOException
+	 *             IOException
+	 * @return fLexicon
 	 */
 	protected Map<String, List<String>> readLexicon(String lexiconFilename) throws IOException {
 		logger.debug(String.format("Reading lexicon from '%s'", lexiconFilename));
@@ -414,8 +451,7 @@ public class JPhonemiser extends InternalModule {
 	/**
 	 * Compile a regex pattern used to determine whether tokens are processed as punctuation or not, based on whether their
 	 * <code>pos</code> attribute matches the pattern.
-	 * 
-	 * @author ingmar
+	 *
 	 */
 	protected void setPunctuationPosRegex() {
 		String language = getLocale().getLanguage();
@@ -435,20 +471,43 @@ public class JPhonemiser extends InternalModule {
 			punctuationPosRegex = Pattern.compile(defaultRegex);
 		}
 		logger.debug(String.format("Punctuation regex pattern set to /%s/", punctuationPosRegex));
-		return;
+	}
+
+	/**
+	 * Compile a regex pattern used to determine whether tokens are processed as unprounounceable or not, based on whether their
+	 * <code>pos</code> attribute matches the pattern.
+	 *
+	 */
+	protected void setUnpronounceablePosRegex() {
+		String language = getLocale().getLanguage();
+		String propertyName = language + ".pos.unprounounceable.regex";
+		String defaultRegex = "^[^a-zA-Z]+$";
+		String regex = MaryProperties.getProperty(propertyName);
+		if (regex == null) {
+			logger.debug(String.format("Property %s not set, using default", propertyName));
+			regex = defaultRegex;
+		} else {
+			logger.debug(String.format("Using property %s", propertyName));
+		}
+		try {
+			unpronounceablePosRegex = Pattern.compile(regex);
+		} catch (PatternSyntaxException e) {
+			logger.error(String.format("Could not compile regex pattern /%s/, using default instead", regex));
+			unpronounceablePosRegex = Pattern.compile(defaultRegex);
+		}
+		logger.debug(String.format("Punctuation regex pattern set to /%s/", unpronounceablePosRegex));
 	}
 
 	/**
 	 * Based on the regex compiled in {@link #setPunctuationPosRegex()}, determine whether a given POS string is classified as
 	 * punctuation
-	 * 
+	 *
 	 * @param pos
 	 *            the POS tag
 	 * @return <b>true</b> if the POS tag matches the regex pattern; <b>false</b> otherwise
 	 * @throws NullPointerException
 	 *             if the regex pattern is null (because it hasn't been set during module startup)
-	 * 
-	 * @author ingmar
+	 *
 	 */
 	public boolean isPosPunctuation(String pos) {
 		if (pos != null && punctuationPosRegex.matcher(pos).matches()) {
@@ -457,16 +516,22 @@ public class JPhonemiser extends InternalModule {
 		return false;
 	}
 
+	public boolean isUnpronounceable(String pos) {
+		if (pos != null && unpronounceablePosRegex.matcher(pos).matches()) {
+			return true;
+		}
+		return false;
+	}
+
 	/**
 	 * Determine whether token should be pronounceable, based on text and POS tag.
-	 * 
+	 *
 	 * @param text
 	 *            the text of the token
 	 * @param pos
 	 *            the POS tag of the token
 	 * @return <b>false</b> if the text is empty, or if it contains no word characters <em>and</em> the POS tag indicates
 	 *         punctuation; <b>true</b> otherwise
-	 * @author ingmar
 	 */
 	public boolean maybePronounceable(String text, String pos) {
 		// does text contain anything at all?
@@ -481,6 +546,11 @@ public class JPhonemiser extends InternalModule {
 
 		// does POS tag indicate punctuation?
 		if (isPosPunctuation(pos)) {
+			return false;
+		}
+
+		// does POS tag indicate punctuation?
+		if (isUnpronounceable(pos)) {
 			return false;
 		}
 

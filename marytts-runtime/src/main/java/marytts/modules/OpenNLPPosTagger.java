@@ -57,11 +57,13 @@ public class OpenNLPPosTagger extends InternalModule {
 	/**
 	 * Constructor which can be directly called from init info in the config file. Different languages can call this code with
 	 * different settings.
-	 * 
+	 *
 	 * @param locale
 	 *            a locale string, e.g. "en"
-	 * 
+	 * @param propertyPrefix
+	 *            propertyPrefix
 	 * @throws Exception
+	 *             Exception
 	 */
 	public OpenNLPPosTagger(String locale, String propertyPrefix) throws Exception {
 		super("OpenNLPPosTagger", MaryDataType.WORDS, MaryDataType.PARTSOFSPEECH, MaryUtils.string2locale(locale));
@@ -109,6 +111,9 @@ public class OpenNLPPosTagger extends InternalModule {
 			while ((t = (Element) tokenIt.nextNode()) != null) {
 				tokens.add(MaryDomUtils.tokenText(t));
 			}
+			if (tokens.size() == 1) {
+				tokens.add(".");
+			}
 			List<String> partsOfSpeech = null;
 			synchronized (this) {
 				partsOfSpeech = tagger.tag(tokens);
@@ -116,11 +121,11 @@ public class OpenNLPPosTagger extends InternalModule {
 			tokenIt.setCurrentNode(sentence); // reset treewalker so we can walk through once again
 			Iterator<String> posIt = partsOfSpeech.iterator();
 			while ((t = (Element) tokenIt.nextNode()) != null) {
+				assert posIt.hasNext();
+				String pos = posIt.next();
 				if (t.hasAttribute("pos")) {
 					continue;
 				}
-				assert posIt.hasNext();
-				String pos = posIt.next();
 				if (posMapper != null) {
 					String gpos = posMapper.get(pos);
 					if (gpos == null)

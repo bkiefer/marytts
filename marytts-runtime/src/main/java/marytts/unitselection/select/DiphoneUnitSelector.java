@@ -31,7 +31,8 @@ public class DiphoneUnitSelector extends UnitSelector {
 	/**
 	 * Initialise the unit selector. Need to call load() separately.
 	 * 
-	 * @see #load(UnitDatabase)
+	 * @throws Exception
+	 *             Exception
 	 */
 	public DiphoneUnitSelector() throws Exception {
 		super();
@@ -61,6 +62,12 @@ public class DiphoneUnitSelector extends UnitSelector {
 		// Make sure there is a final silence
 		if (!prev.isSilence()) {
 			HalfPhoneTarget silence = new HalfPhoneTarget(silenceSymbol + "_L", null, true);
+			targets.add(new DiphoneTarget(prev, silence));
+			prev = silence;
+		}
+		// Make sure final silence has a right half
+		if (prev.isSilence()) {
+			HalfPhoneTarget silence = new HalfPhoneTarget(silenceSymbol + "_R", null, true);
 			targets.add(new DiphoneTarget(prev, silence));
 		}
 		return targets;

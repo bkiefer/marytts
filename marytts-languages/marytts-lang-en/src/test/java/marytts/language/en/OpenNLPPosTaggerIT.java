@@ -35,6 +35,7 @@ public class OpenNLPPosTaggerIT extends MaryModuleTestCase {
 	/**
 	 * @param needMaryStarted
 	 * @throws Exception
+	 *             Exception
 	 */
 	public OpenNLPPosTaggerIT() throws Exception {
 		super(true); // start MARY
@@ -58,6 +59,8 @@ public class OpenNLPPosTaggerIT extends MaryModuleTestCase {
 		module.startup();
 		// exercise:
 		processAndCompare("example2-en_US", Locale.US);
+		processAndCompare("examplesingle-en_US", Locale.US);
+		processAndCompare("exampleshift-en_US", Locale.US);
 		// teardown:
 		module.shutdown();
 		module = null;

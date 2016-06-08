@@ -26,6 +26,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Properties;
 
+import org.hsqldb.error.Error;
+
 import marytts.cart.CART;
 import marytts.cart.LeafNode.StringAndFloatLeafNode;
 import marytts.cart.io.MaryCARTReader;
@@ -57,10 +59,14 @@ public class TrainedLTS {
 	 * 
 	 * @param aPhonSet
 	 *            phoneset used in syllabification
-	 * @param treeFilename
+	 * @param treeStream
+	 *            treeStream
 	 * @param removeTrailingOneFromPhones
+	 *            removeTrailingOneFromPhones
 	 * @throws IOException
-	 * 
+	 *             IOException
+	 * @throws MaryConfigurationException
+	 *             MaryConfigurationException
 	 */
 	public TrainedLTS(AllophoneSet aPhonSet, InputStream treeStream, boolean removeTrailingOneFromPhones) throws IOException,
 			MaryConfigurationException {
@@ -75,9 +81,12 @@ public class TrainedLTS {
 	 * 
 	 * @param aPhonSet
 	 *            phoneset used in syllabification
-	 * @param treeFilename
+	 * @param treeStream
+	 *            treeStream
 	 * @throws IOException
-	 * 
+	 *             IOException
+	 * @throws MaryConfigurationException
+	 *             MaryConfigurationException
 	 */
 	public TrainedLTS(AllophoneSet aPhonSet, InputStream treeStream) throws IOException, MaryConfigurationException {
 		this(aPhonSet, treeStream, true);
@@ -100,7 +109,11 @@ public class TrainedLTS {
 	 * Convenience method to load tree from an inputstream
 	 * 
 	 * @param treeStream
+	 *            treeStream
 	 * @throws IOException
+	 *             IOException
+	 * @throws MaryConfigurationException
+	 *             MaryConfigurationException
 	 */
 	public void loadTree(InputStream treeStream) throws IOException, MaryConfigurationException {
 		MaryCARTReader cartReader = new MaryCARTReader();
@@ -145,6 +158,7 @@ public class TrainedLTS {
 			StringAndFloatLeafNode leaf = (StringAndFloatLeafNode) tree.interpretToNode(fv, 0);
 			String prediction = leaf.mostProbableString(featureDefinition, indexPredictedFeature);
 			returnStr += prediction.substring(1, prediction.length() - 1);
+
 		}
 
 		return returnStr;
