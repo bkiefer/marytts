@@ -1,11 +1,7 @@
 package marytts.language.lb
 
-import groovy.xml.*
-import groovy.util.slurpersupport.*
 
-import marytts.datatypes.MaryData
-import marytts.datatypes.MaryDataType
-import marytts.datatypes.MaryXML
+import marytts.data.Utterance
 import marytts.util.dom.DomUtils
 import marytts.modules.InternalModule
 
@@ -35,7 +31,7 @@ class LuxembourgishPreprocess extends InternalModule {
 
 
     public LuxembourgishPreprocess() {
-        super("LuxembourgishPreprocess", MaryDataType.TOKENS, MaryDataType.WORDS, LB_LOCALE.toLocale());
+        super("LuxembourgishPreprocess", LB_LOCALE.toLocale());
         formatRules = this.getClass().getResource('preprocess/formatRules.txt').getText('UTF-8')
         rbnf = new RuleBasedNumberFormat(formatRules, LB_LOCALE)
         cardinalRule = "%spellout-numbering"
@@ -43,7 +39,7 @@ class LuxembourgishPreprocess extends InternalModule {
         yearRule = "%spellout-numbering-year"
     }
 
-    public MaryData process(MaryData input) {
+    public Utterance process(Utterance input) {
         // get XML from input
         def inputXmlStr = DomUtils.serializeToString input.document
         def xml = new XmlSlurper(false, false).parseText inputXmlStr

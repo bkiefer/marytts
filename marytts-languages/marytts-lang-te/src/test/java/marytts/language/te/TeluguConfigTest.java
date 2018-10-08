@@ -19,41 +19,38 @@
  */
 package marytts.language.te;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 import java.util.Locale;
 
 import marytts.config.LanguageConfig;
-import marytts.config.MaryConfig;
+import marytts.config.MaryConfigLoader;
 import marytts.exceptions.MaryConfigurationException;
 
-import org.junit.Test;
+import org.testng.Assert;
+import org.testng.annotations.*;
 
 /**
  * @author marc
  *
  */
 public class TeluguConfigTest {
-	private static final Locale TELUGU = new Locale("te");
+    private static final Locale TELUGU = new Locale("te");
 
-	@Test
-	public void isNotMainConfig() throws MaryConfigurationException {
-		MaryConfig m = new TeluguConfig();
-		assertFalse(m.isMainConfig());
-	}
+    @Test
+    public void isNotMainConfig() throws MaryConfigurationException {
+        MaryConfig m = new TeluguConfig();
+        Assert.assertFalse(m.isMainConfig());
+    }
 
-	@Test
-	public void canGet() {
-		MaryConfig m = MaryConfig.getLanguageConfig(TELUGU);
-		assertNotNull(m);
-		assertTrue(((LanguageConfig) m).getLocales().contains(TELUGU));
-	}
+    @Test
+    public void canGet() {
+        MaryConfig m = MaryConfig.getLanguageConfig(TELUGU);
+        Assert.assertNotNull(m);
+        Assert.assertTrue(((LanguageConfig) m).getLocales().contains(TELUGU));
+    }
 
-	@Test
-	public void hasRussianLocale() throws MaryConfigurationException {
-		LanguageConfig e = new TeluguConfig();
-		assertTrue(e.getLocales().contains(TELUGU));
-	}
+    @Test
+    public void hasRussianLocale() throws MaryConfigurationException {
+        LanguageConfig e = new TeluguConfig();
+        Assert.assertTrue(e.getLocales().contains(TELUGU));
+    }
 }

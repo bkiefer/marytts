@@ -19,11 +19,12 @@
  */
 package marytts.language.ru;
 
-import marytts.config.LanguageConfig;
+import marytts.config.PropertiesMaryConfigLoader;
 import marytts.exceptions.MaryConfigurationException;
 
-public class RussianConfig extends LanguageConfig {
-	public RussianConfig() throws MaryConfigurationException {
-		super(RussianConfig.class.getResourceAsStream("ru.config"));
-	}
+public class RussianConfig extends PropertiesMaryConfigLoader {
+    public RussianConfig() throws MaryConfigurationException {
+	super();
+        //super(RussianConfig.class.getResourceAsStream("ru.config"));
+    }
 }
