@@ -19,11 +19,12 @@
  */
 package marytts.language.nl;
 
-import marytts.config.LanguageConfig;
+import marytts.config.PropertiesMaryConfigLoader;
 import marytts.exceptions.MaryConfigurationException;
 
-public class DutchConfig extends LanguageConfig {
+public class DutchConfig extends PropertiesMaryConfigLoader {
 	public DutchConfig() throws MaryConfigurationException {
-		super(DutchConfig.class.getResourceAsStream("nl.config"));
+        super();
+	loadConfiguration("nl_NL", DutchConfig.class.getResourceAsStream("nl.config"));
 	}
 }

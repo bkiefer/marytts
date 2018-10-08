@@ -52,6 +52,7 @@ public class Preprocess extends InternalModule {
   private static final Pattern ordinalPattern = Pattern.compile("(\\d+)[e.]");
 
 	protected void checkForNumbers(Document doc) {
+/* TODO: Update!!!
 		TreeWalker tw = ((DocumentTraversal) doc).createTreeWalker(doc, NodeFilter.SHOW_ELEMENT,
 				new NameNodeFilter(MaryXML.TOKEN), false);
 		Element t = null;
@@ -78,7 +79,7 @@ public class Preprocess extends InternalModule {
                             MaryDomUtils.encloseWithMTU(t, origText, null);
 			}
                         
-		}
+		}*/
 	}
 
 	protected String expandNumber(double number) {
