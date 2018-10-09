@@ -33,7 +33,7 @@ import marytts.util.io.FileUtils;
 
 /**
  * For the given texts, compute unit features and align them with the given unit labels.
- * 
+ *
  * @author schroed
  *
  */
@@ -162,9 +162,9 @@ public class PhoneUnitFeatureComputer extends VoiceImportComponent {
 		textDir = new File(db.getProp(db.TEXTDIR));
 		System.out.println("Computing unit features for " + bnl.getLength() + " files");
 		for (int i = 0; i < bnl.getLength(); i++) {
+			System.out.println("    " + bnl.getName(i));
 			percent = 100 * i / bnl.getLength();
 			computeFeaturesFor(bnl.getName(i));
-			System.out.println("    " + bnl.getName(i));
 		}
 		System.out.println("Finished computing the unit features.");
 		return true;
@@ -184,7 +184,7 @@ public class PhoneUnitFeatureComputer extends VoiceImportComponent {
 
 	/**
 	 * Provide the progress of computation, in percent, or -1 if that feature is not implemented.
-	 * 
+	 *
 	 * @return -1 if not implemented, or an integer between 0 and 100.
 	 */
 	public int getProgress() {

@@ -41,10 +41,11 @@ public class Phonemiser extends marytts.modules.JPhonemiser {
 			return result;
 		}
 
-    if (text.equals("een") || text.equals("\u00E9\u00E9n"))
-      return "En";
-
-		result = lexiconLookup(text, pos);
+    if (text.equals("een") || text.equals("\u00E9\u00E9n")) {
+      result = "En";
+    } else {
+      result = lexiconLookup(text, pos);
+    }
     if (result != null) {
 			g2pMethod.append("lexicon");
 			return result;
