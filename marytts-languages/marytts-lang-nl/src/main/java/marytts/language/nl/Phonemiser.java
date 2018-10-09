@@ -20,14 +20,15 @@
 package marytts.language.nl;
 
 import java.io.IOException;
+import java.util.Locale;
 
 import marytts.exceptions.MaryConfigurationException;
 import marytts.util.MaryUtils;
 
-public class Phonemiser extends marytts.modules.JPhonemiser {
+public class Phonemiser extends marytts.modules.nlp.JPhonemiser {
 
 	public Phonemiser() throws IOException, MaryConfigurationException {
-		super("nl.");
+		super(new Locale("nl"));
 	}
 
 	@Override

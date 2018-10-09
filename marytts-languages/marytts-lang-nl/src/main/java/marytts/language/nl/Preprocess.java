@@ -2,84 +2,82 @@ package marytts.language.nl;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-
-import marytts.datatypes.MaryData;
-import marytts.datatypes.MaryDataType;
-import marytts.datatypes.MaryXML;
-import marytts.modules.InternalModule;
-import marytts.util.dom.MaryDomUtils;
-import marytts.util.dom.NameNodeFilter;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.traversal.DocumentTraversal;
-import org.w3c.dom.traversal.NodeFilter;
-import org.w3c.dom.traversal.TreeWalker;
-
 import com.ibm.icu.text.RuleBasedNumberFormat;
 import com.ibm.icu.util.ULocale;
+
+import marytts.MaryException;
+import marytts.config.MaryConfiguration;
+import marytts.data.Sequence;
+import marytts.data.SupportedSequenceType;
+import marytts.data.Utterance;
+import marytts.data.item.linguistic.Word;
+import marytts.exceptions.MaryConfigurationException;
+import marytts.modules.MaryModule;
 
 /**
  * @author Tristan Hamilton
  *
  *         Processes cardinal and ordinal numbers.
  */
-public class Preprocess extends InternalModule {
+public class Preprocess extends MaryModule {
 
 	private RuleBasedNumberFormat rbnf;
 	protected final String cardinalRule;
 	protected final String ordinalRule;
 
 	public Preprocess() {
-		super("Preprocess", MaryDataType.TOKENS, MaryDataType.WORDS, new Locale("nl"));
+	  super("preprocessing");
 		this.rbnf = new RuleBasedNumberFormat(new ULocale("nl"), RuleBasedNumberFormat.SPELLOUT);
 		this.cardinalRule = "%spellout-numbering";
 		this.ordinalRule = getOrdinalRuleName(rbnf);
 	}
 
-	public MaryData process(MaryData d) throws Exception {
-		Document doc = d.getDocument();
-		checkForNumbers(doc);
-		MaryData result = new MaryData(getOutputType(), d.getLocale());
-		result.setDocument(doc);
-		return result;
+  public void setDescription() {
+    this.description = "Dutch token preprocessing module.";
+  }
+
+  public void checkStartup() throws MaryConfigurationException {
+  }
+  /**
+   *  Check if the input contains all the information needed to be
+   *  processed by the module.
+   *
+   *  @param utt the input utterance
+   *  @throws MaryException which indicates what is missing if something is missing
+   */
+  public void checkInput(Utterance utt) throws MaryException {
+      if (!utt.hasSequence(SupportedSequenceType.WORD)) {
+          throw new MaryException("Word sequence is missing", null);
+      }
+  }
+
+	public Utterance process(Utterance utt, MaryConfiguration configuration) throws MaryException {
+
+	  checkForNumbers(utt);
+
+		return utt;
 	}
 
   private static final Pattern ordinalPattern = Pattern.compile("(\\d+)[e.]");
 
-	protected void checkForNumbers(Document doc) {
-/* TODO: Update!!!
-		TreeWalker tw = ((DocumentTraversal) doc).createTreeWalker(doc, NodeFilter.SHOW_ELEMENT,
-				new NameNodeFilter(MaryXML.TOKEN), false);
-		Element t = null;
-		while ((t = (Element) tw.nextNode()) != null) {
-			if (MaryDomUtils.hasAncestor(t, MaryXML.SAYAS) || t.hasAttribute("ph") || t.hasAttribute("sounds_like")) {
-				// ignore token
-				continue;
-			}
-			String origText = MaryDomUtils.tokenText(t);
-                        boolean textModified = false;
-			Matcher m = ordinalPattern.matcher(origText);
-			if (m.matches()) {
-			  String matched = m.group(1);
-			  Long l = Long.parseLong(matched);
-			  MaryDomUtils.setTokenText(t, expandOrdinal(l));
-                          textModified = true;
-			} else if (origText.matches("\\d+")) {
-			  MaryDomUtils.setTokenText(t, expandNumber(Long.parseLong(origText)));
-                          textModified = true;
-			}
-                        
-			// if token isn't ignored but there is no handling rule don't add MTU
-			if (textModified) {
-                            MaryDomUtils.encloseWithMTU(t, origText, null);
-			}
-                        
-		}*/
+	protected void checkForNumbers(Utterance utt) {
+	  for (Word w : (Sequence<Word>) utt.getSequence(SupportedSequenceType.WORD)) {
+      // Ignore phonemise or assmilated token
+      if (w.soundsLike() != null) {
+          continue;
+      }
+      String orig_text = w.getText();
+      Matcher m = ordinalPattern.matcher(orig_text);
+      if (m.matches()) {
+        String matched = m.group(1);
+        w.soundsLike(expandOrdinal(Long.parseLong(matched)));
+      } else if (orig_text.matches("\\d+")) {
+        w.soundsLike(expandNumber(Long.parseLong(orig_text)));
+      }
+    }
 	}
 
 	protected String expandNumber(double number) {
