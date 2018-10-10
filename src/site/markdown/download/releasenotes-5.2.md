@@ -11,9 +11,17 @@ Improvements
 * Better support for Java 8
 * Some migration towards building with Gradle
 
+Voicebuilding
+-------------
+
+* All unit-selection voices have been rebuilt using the new [Gradle plugin](https://github.com/marytts/gradle-marytts-voicebuilding-plugin)
+* All HSMM voices are now hosted on Bintray and can be resolved as dependencies
+* Voices with open data now have open-source voicebuilding repositories hosted on GitHub, which include downloadable distribution packages
+
 Development news
 ----------------
 
+* [#533](https://github.com/marytts/marytts/pull/533): support system preferredmodule
 * [#525](https://github.com/marytts/marytts/pull/525): Update dependencies and maven plugins
 * [#523](https://github.com/marytts/marytts/pull/523): solving quotes phonetisation problem
 * [#506](https://github.com/marytts/marytts/pull/506): Duplicate subexpressions in `WeightedCodebookMfccMapper.java`
@@ -36,6 +44,10 @@ Development news
 Fixed Issues/Bugs
 -----------------
 
+* [#593](https://github.com/marytts/marytts/pull/593): Don't split up multiple punctuation marks in tokenization
+* [#570](https://github.com/marytts/marytts/issues/570): Praat TextGrid output is invalid with boundaries (times are not monotonic)
+* [#564](https://github.com/marytts/marytts/pull/564): add missing TOKENS examples
+* [#555](https://github.com/marytts/marytts/issues/555): HMMModel generates malformed XML duration attributes
 * [#531](https://github.com/marytts/marytts/issues/531): java.awt.HeadlessException in (Half)PhoneLabelFeatureAligner
 * [#516](https://github.com/marytts/marytts/issues/516): Single words conduct to have a wrong POS which leads to a crash of the target feature module
 * [#515](https://github.com/marytts/marytts/pull/515): preprocessing contraction and double quotes correction

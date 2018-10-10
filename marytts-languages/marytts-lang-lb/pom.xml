@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>de.dfki.mary</groupId>
 		<artifactId>marytts</artifactId>
-		<version>5.2-SNAPSHOT</version>
+		<version>5.2</version>
 		<relativePath>../../pom.xml</relativePath>
 	</parent>
 
@@ -52,6 +52,13 @@
 		<dependency>
 			<groupId>xmlunit</groupId>
 			<artifactId>xmlunit</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>marytts-runtime</artifactId>
+			<version>${project.parent.version}</version>
+			<type>test-jar</type>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
