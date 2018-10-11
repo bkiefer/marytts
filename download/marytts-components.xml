@@ -301,11 +301,11 @@
     </package>
     <depends language="tr" version="5.2"/>
   </voice>
-  <voice locale="nl" name="dfki-antje" gender="female" type="unit selection" version="5.2">
+  <voice locale="nl" name="antje" gender="female" type="hsmm" version="5.2">
     <description>A female Dutch unit selection voice</description>
     <license href="http://mary.dfki.de/download/by-nd-3.0.html"/>
-    <package md5sum="618d7e330f4c82813a78f4acc13a3b8e" filename="voice-dfki-antje-5.2.zip" size="538806903">
-      <location folder="false" href="http://ox6.dfki.de/publications/documents/10/1bae6caf821599af28d4710ce203778"/>
+    <package filename="voice-antje-hsmm-5.2.zip" md5sum="d74ab797ba0ed7c0187c303741a94e3f" size="2241975">
+      <location folder="true" href="http://mary.dfki.de/download/5.2/"/>
     </package>
     <depends language="nl" version="5.2"/>
   </voice>
